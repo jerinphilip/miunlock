@@ -9,24 +9,29 @@ from request import Auth, UnlockRequest
 
 logging.basicConfig(level=logging.WARNING)
 
-use_fastboot = False
-
 
 auth = Auth()
 auth.login_tui("unlockApi")
 logging.debug(auth.__dict__)
 
+API_URL = "unlock.update.miui.com"
+API_URL_IN = "in-unlock.update.intl.miui.com"
+API_URL_INTL = "unlock.update.intl.miui.com"
+API_URL = API_URL_INTL
+clientVersion = "6.5.406.31"
+
 r = UnlockRequest(
     auth,
-    "unlock.update.miui.com",
+    API_URL,
     "/api/v3/unlock/userinfo",
     {
         "data": {
             "uid": auth.userid,
             "clientId": "1",
-            "clientVersion": "5.5.224.24",
+            "clientVersion": clientVersion,
             "language": "en",
-            "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            # "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            "pcId": auth.pcid,
             "region": "",
         }
     },
@@ -65,15 +70,16 @@ else:
 
 r = UnlockRequest(
     auth,
-    "unlock.update.miui.com",
-    "/api/v2/unlock/device/clear",
+    API_URL,
+    "/api/v3/unlock/device/clear",
     {
         "appId": "1",
         "data": {
             "clientId": "1",
-            "clientVersion": "5.5.224.24",
+            "clientVersion": clientVersion,
             "language": "en",
-            "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            # "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            "pcId": auth.pcid,
             "product": product,
             "region": "",
         },
@@ -89,16 +95,17 @@ input("Press Ctrl-C to cancel, or enter to continue. ")
 
 r = UnlockRequest(
     auth,
-    "unlock.update.miui.com",
-    "/api/v3/ahaUnlock",
+    API_URL,
+    "/api/v2/ahaUnlock",
     {
         "appId": "1",
         "data": {
             "clientId": "2",  # updated client id
-            "clientVersion": "5.5.224.24",  # updated version number
+            "clientVersion": clientVersion,  # updated version number
             "language": "en",
             "operate": "unlock",
-            "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            # "pcId": hashlib.md5(auth.pcid.encode("utf-8")).hexdigest(),
+            "pcId": auth.pcid,
             "product": product,
             "region": "",
             "deviceInfo": {

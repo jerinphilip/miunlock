@@ -11,6 +11,7 @@ import urllib
 import uuid
 import webbrowser
 from base64 import b64decode, b64encode
+import textwrap
 
 import requests
 from Cryptodome.Cipher import AES
@@ -40,8 +41,15 @@ class Auth:
     def login_tui(self, sid):
         self.login(
             input(
-                "Go to account.xiaomi.com,log in and paste the code inside code.txt\n(dont forget to change the username and password or else it will fail)\nto devtools console (press f12 then select console) then copypaste the response to here: ".format(
-                    self.LOGIN_URL.format(sid)
+                textwrap.dedent(
+                    """
+                    Go to account.xiaomi.com,log in and paste the code inside
+                    code.txt (dont forget to change the username and password
+                    or else it will fail) to devtools console (press f12 then
+                    select console) then copypaste the response to here: 
+                    """.format(
+                        self.LOGIN_URL.format(sid)
+                    )
                 )
             )
         )  # please edit this,this is so bad
@@ -60,7 +68,13 @@ class Auth:
         if data["code"] != 0:
             if data["code"] == 70016:
                 raise UserError(
-                    "Invalid username or password,find the username and password section in code.txt and change them to your username and password.",
+                    textwrap.dedent(
+                        """
+                        Invalid username or password, find the username and
+                        password section in code.txt and change them to your
+                        username and password.
+                        """
+                    ),
                     3,
                 )
             else:
@@ -74,17 +88,40 @@ class Auth:
             "https://account.xiaomi.com/identity/authStart"
         ):
             raise UserError(
-                f"You need to verify your Xiaomi account before beeing able to retreve valid information from servers. Open this link to start verification process: \33[34m{data['notificationUrl']}\33[0m",
+                textwrap.dedent(
+                    f"""
+                    You need to verify your Xiaomi account before beeing able
+                    to retreve valid information from servers. Open this link
+                    to start verification process:
+                    \33[34m{data['notificationUrl']}\33[0m
+                    """
+                ),
                 3,
             )
         elif "…" in data["location"]:
             raise UserError(
-                "Your response has been shortened by the browser's DevTool, and because of that, it isn't valid. To fix that, check a quick guide here: \33[34mhttps://github.com/Canny1913/miunlock/pull/8#issuecomment-1186278739\33[0m",
+                textwrap.dedent(
+                    """
+                    Your response has been shortened by the browser's DevTool,
+                    and because of that, it isn't valid. To fix that, check a
+                    quick guide here:
+                    \33[34mhttps://github.com/Canny1913/miunlock/pull/8#issuecomment-1186278739\33[0m
+                    """
+                ),
                 3,
             )
         elif data["location"] == "":
             raise XiaomiError(
-                "Location URL is empty. This probably means that you've got an error or some sort of notice. Create a issue with full response here, so it can be investigated (but before posting, check for ssecurity, psecurity, userId, cUserId or passToken, and if they are present, censor them): \33[34mhttps://github.com/Canny1913/miunlock/issues/new\33[0m",
+                textwrap.dedent(
+                    """
+                    Location URL is empty. This probably means that you've got
+                    an error or some sort of notice. Create a issue with full
+                    response here, so it can be investigated (but before
+                    posting, check for ssecurity, psecurity, userId, cUserId or
+                    passToken, and if they are present, censor them):
+                    \33[34mhttps://github.com/Canny1913/miunlock/issues/new\33[0m
+                    """
+                ),
                 5,
             )
         self.ssecurity = data["ssecurity"]
